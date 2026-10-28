@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E 4 U - Master the Future Tenses (Arcade Edition)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      touch-action: manipulation;
+      background: radial-gradient(circle at top, #1e1b4b, #0f172a);
+      color: #f8fafc;
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .glass-card-light {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .glow-effect {
+      animation: pulse-glow 3s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.5); }
+      50% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.8); }
+    }
+
+    .word-chip {
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .word-chip:hover { transform: translateY(-2px) scale(1.03); }
+    .word-chip:active { transform: translateY(1px) scale(0.98); }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- TOP HEADER & GAME DASHBOARD -->
+  <header class="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+      
+      <div class="flex items-center space-x-3">
+        <span class="bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-500 text-slate-950 font-black text-2xl px-3.5 py-1 rounded-2xl shadow-lg shadow-indigo-500/20">
+          E 4 U
+        </span>
+        <div>
+          <h1 class="text-lg md:text-xl font-black tracking-tight text-white flex items-center gap-2">
+            FUTURE QUEST <span class="bg-amber-400/20 text-amber-400 text-xs px-2 py-0.5 rounded-full border border-amber-400/30 font-bold uppercase">Arcade</span>
+          </h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Master English Future Tenses through interactive visual challenges</p>
+        </div>
+      </div>
+
+      <!-- PLAYER HUD -->
+      <div id="hud-bar" class="flex items-center space-x-3 md:space-x-5">
+        <div class="flex items-center space-x-1.5 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/60" title="Current Combo Streak">
+          <i class="fa-solid fa-fire text-amber-400 text-lg animate-bounce"></i>
+          <span id="hud-streak" class="font-extrabold text-amber-400 text-sm md:text-base">0x</span>
+        </div>
+
+        <div class="flex items-center space-x-1 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700/60" title="Remaining HP">
+          <i class="fa-solid fa-heart text-rose-500 text-sm"></i>
+          <span id="hud-lives" class="font-extrabold text-rose-400 text-sm md:text-base">3</span>
+        </div>
+
+        <div class="flex items-center space-x-1.5 bg-indigo-950/80 px-3 py-1.5 rounded-xl border border-indigo-700/60 shadow-inner">
+          <i class="fa-solid fa-trophy text-amber-300 text-sm"></i>
+          <span id="hud-score" class="font-black text-amber-300 text-sm md:text-base">0</span>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-5xl mx-auto w-full p-4 flex-grow flex flex-col justify-center">
+
+    <!-- MODE SELECTOR TABS -->
+    <div class="flex justify-center mb-6 gap-3">
+      <button id="tab-game" onclick="switchMode('game')" class="px-5 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+        <i class="fa-solid fa-gamepad text-lg"></i>
+        <span>Play Quest</span>
+      </button>
+      <button id="tab-codex" onclick="switchMode('codex')" class="px-5 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2">
+        <i class="fa-solid fa-film text-lg text-amber-400"></i>
+        <span>Video & Rules</span>
+      </button>
+    </div>
+
+    <!-- GAMEPLAY VIEW -->
+    <section id="game-view" class="space-y-6">
+
+      <div class="glass-card p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="w-full sm:w-2/3">
+          <div class="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+            <span id="stage-title">Stage 1: Instant Decisions</span>
+            <span id="question-progress">Mission 1 / 10</span>
+          </div>
+          <div class="w-full bg-slate-950 h-3.5 rounded-full p-0.5 border border-slate-800 overflow-hidden">
+            <div id="game-progress-bar" class="bg-gradient-to-r from-amber-400 via-indigo-500 to-purple-500 h-full rounded-full w-10/100 transition-all duration-500"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button id="powerup-5050" onclick="usePowerup('5050')" class="px-3 py-1.5 bg-purple-900/60 hover:bg-purple-800 text-purple-200 border border-purple-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> 50/50 (<span id="count-5050">1</span>)
+          </button>
+          <button id="powerup-hint" onclick="usePowerup('hint')" class="px-3 py-1.5 bg-amber-900/60 hover:bg-amber-800 text-amber-200 border border-amber-500/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+            <i class="fa-solid fa-lightbulb text-amber-400"></i> Visual Hint (<span id="count-hint">2</span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- DYNAMIC GAME CARD WITH VECTOR VISUAL SCENE -->
+      <div id="game-card" class="glass-card-light rounded-3xl p-6 md:p-8 text-slate-900 shadow-2xl relative overflow-hidden transition-all duration-300">
+        
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center mb-6">
+          
+          <!-- DYNAMIC SVG SCENE CONTAINER -->
+          <div id="svg-scene-container" class="md:col-span-5 relative rounded-2xl overflow-hidden border-2 border-indigo-200 shadow-lg bg-slate-900 min-h-[180px] flex items-center justify-center p-4">
+            <!-- Dynamic SVG content inserted via JS -->
+          </div>
+
+          <!-- PROMPT & CONTEXT -->
+          <div class="md:col-span-7 flex flex-col justify-center space-y-3">
+            <div class="flex items-center gap-2">
+              <span id="mode-badge" class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+                Visual Context
+              </span>
+              <span id="difficulty-indicator" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                Easy
+              </span>
+            </div>
+
+            <h2 id="scene-prompt" class="text-xl md:text-2xl font-extrabold text-slate-900 leading-snug">
+              Loading visual scene context...
+            </h2>
+            <p id="scene-subtext" class="text-sm text-slate-600 font-medium">
+              Analyze the visual situation above and complete the dialog correctly.
+            </p>
+          </div>
+
+        </div>
+
+        <div id="play-area" class="bg-slate-50 p-5 rounded-2xl border border-slate-200 mb-6"></div>
+
+        <div id="hint-panel" class="hidden mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl text-amber-900 text-sm flex items-start gap-3">
+          <i class="fa-solid fa-lightbulb text-amber-500 text-xl flex-shrink-0 mt-0.5"></i>
+          <div>
+            <strong class="font-bold block mb-0.5">Clue / Rule Hint:</strong>
+            <span id="hint-text">Use Will when making a decision at the moment of speaking!</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-slate-200 pt-5">
+          <div id="attempt-info" class="text-xs font-extrabold text-slate-500 flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-indigo-500"></i>
+            <span>Attempts remaining: <strong id="attempts-left" class="text-indigo-600">2</strong></span>
+          </div>
+          <button id="action-btn" onclick="submitCurrentAnswer()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-8 py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center space-x-2 text-base">
+            <span>Confirm Answer</span>
+            <i class="fa-solid fa-circle-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- RULES & VIDEO CODEX VIEW -->
+    <section id="codex-view" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-2xl border border-slate-700">
+        <h2 class="text-2xl font-black text-amber-400 mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-film text-amber-400"></i> Video Lesson & Grammar Codex
+        </h2>
+        <p class="text-slate-300 text-sm">Guarda la video-spiegazione dettagliata ed esplora le schede di ripasso prima della Sfida!</p>
+      </div>
+
+      <!-- YOUTUBE EMBEDDED VIDEO PLAYER -->
+      <div class="glass-card p-4 rounded-2xl border border-slate-700 space-y-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-brands fa-youtube text-red-500 text-xl"></i> English Future Tenses Video Guide (Will vs Going To vs Present Continuous)
+        </h3>
+        <div class="relative w-full overflow-hidden rounded-xl aspect-video bg-black border border-slate-800">
+          <iframe 
+            class="w-full h-full" 
+            src="https://www.youtube-nocookie.com/embed/8HUj-FNEQiU" 
+            title="Future Tenses Explained" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+      <!-- CODEX CARDS GRID -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="glass-card p-5 rounded-2xl border border-indigo-500/30 hover:border-indigo-400 transition">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl mb-3">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">1. Future Simple (WILL)</h3>
+          <p class="text-xs text-indigo-300 font-semibold mb-3">Spontaneous Decisions & Opinions</p>
+          <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
+            <li><strong>Instant Decisions:</strong> "I'll open the door!"</li>
+            <li><strong>Personal Predictions:</strong> "I think it will rain."</li>
+            <li><strong>Promises & Offers:</strong> "I will help you."</li>
+          </ul>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-emerald-500/30 hover:border-emerald-400 transition">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl mb-3">
+            <i class="fa-solid fa-cloud-showers-heavy"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">2. BE GOING TO</h3>
+          <p class="text-xs text-emerald-300 font-semibold mb-3">Intentions & Physical Evidence</p>
+          <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
+            <li><strong>Prior Plans:</strong> "I'm going to study engineering next year."</li>
+            <li><strong>Present Evidence:</strong> "Look at those black clouds! It's going to rain."</li>
+          </ul>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-amber-500/30 hover:border-amber-400 transition">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mb-3">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">3. Present Continuous</h3>
+          <p class="text-xs text-amber-300 font-semibold mb-3">Fixed Personal Arrangements</p>
+          <ul class="text-xs text-slate-300 space-y-2 list-disc pl-4">
+            <li><strong>Arranged Appointments:</strong> "I am seeing the doctor tomorrow at 10 AM."</li>
+            <li><strong>Tickets & Dates:</strong> "We are flying to Paris on Friday."</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS SUMMARY -->
+    <section id="results-view" class="hidden space-y-6">
+      <div class="glass-card p-8 rounded-3xl border border-slate-700 text-center space-y-5 max-w-2xl mx-auto shadow-2xl">
+        <div id="result-trophy-box" class="w-24 h-24 mx-auto rounded-3xl bg-amber-400/20 border border-amber-400/40 text-amber-400 flex items-center justify-center text-5xl glow-effect">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+
+        <div>
+          <h2 id="result-header" class="text-3xl font-black text-white">Quest Completed!</h2>
+          <p id="result-subtitle" class="text-slate-300 text-sm mt-1">Here is your final game evaluation</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 py-4 bg-slate-900/60 rounded-2xl border border-slate-800">
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase">Final Score</span>
+            <div id="res-score" class="text-2xl font-black text-amber-400">0</div>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase">Max Combo</span>
+            <div id="res-streak" class="text-2xl font-black text-purple-400">0x</div>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-400 uppercase">Accuracy</span>
+            <div id="res-accuracy" class="text-2xl font-black text-emerald-400">0%</div>
+          </div>
+        </div>
+
+        <div class="flex justify-center gap-4">
+          <button onclick="restartQuest()" class="px-8 py-3.5 rounded-xl font-extrabold bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:scale-105 active:scale-95 transition">
+            <i class="fa-solid fa-rotate-right mr-2"></i> Play Again
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-slate-950 border-t border-slate-900 text-slate-500 text-xs py-4 text-center">
+    <p class="font-semibold">E 4 U - High School English Learning Experience</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+  <script>
+    // VECTOR SVG GRAPHICS DATABASE FOR EACH QUESTION SCENE
+    const vectorScenes = {
+      phone: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#1e1b4b"/>
+          <circle cx="100" cy="60" r="35" fill="#6366f1" opacity="0.3" class="animate-ping"/>
+          <circle cx="100" cy="60" r="28" fill="#4f46e5"/>
+          <path d="M90 50 C90 45, 110 45, 110 50 C110 65, 90 65, 90 70 L110 70" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
+          <text x="100" y="105" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="bold">RING RING!</text>
+        </svg>`,
+      clouds: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#0f172a"/>
+          <path d="M50 65 Q60 40 85 45 Q100 30 125 40 Q145 35 155 55 Q170 65 155 80 Q140 85 60 85 Q40 80 50 65 Z" fill="#334155"/>
+          <path d="M75 88 L70 102 M100 88 L95 102 M125 88 L120 102" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+          <text x="100" y="25" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="bold">DARK CLOUDS</text>
+        </svg>`,
+      plane: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#0284c7"/>
+          <path d="M30 70 L170 30 L140 75 L110 70 L80 90 L85 70 Z" fill="#ffffff"/>
+          <rect x="25" y="85" width="45" height="25" rx="4" fill="#fbbf24"/>
+          <text x="47" y="101" text-anchor="middle" fill="#1e293b" font-size="8" font-weight="black">TICKET</text>
+        </svg>`,
+      homework: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#312e81"/>
+          <rect x="50" y="25" width="100" height="70" rx="6" fill="#ffffff"/>
+          <line x1="65" y1="45" x2="135" y2="45" stroke="#94a3b8" stroke-width="3"/>
+          <line x1="65" y1="60" x2="120" y2="60" stroke="#94a3b8" stroke-width="3"/>
+          <circle cx="140" cy="75" r="12" fill="#22c55e"/>
+          <path d="M134 75 L138 79 L146 71" stroke="#ffffff" stroke-width="2"/>
+        </svg>`,
+      vacation: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#0f766e"/>
+          <circle cx="160" cy="35" r="20" fill="#fbbf24"/>
+          <path d="M20 100 Q60 80 100 100 Q140 80 180 100" stroke="#38bdf8" stroke-width="8"/>
+          <path d="M70 90 L90 50 L110 90 Z" fill="#f43f5e"/>
+        </svg>`,
+      dentist: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#1e293b"/>
+          <circle cx="100" cy="50" r="25" fill="#38bdf8"/>
+          <rect x="65" y="85" width="70" height="25" rx="6" fill="#f1f5f9"/>
+          <text x="100" y="101" text-anchor="middle" fill="#0f172a" font-size="10" font-weight="black">APPOINTMENT: 3 PM</text>
+        </svg>`,
+      mars: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#450a0a"/>
+          <circle cx="100" cy="110" r="70" fill="#dc2626"/>
+          <path d="M120 30 L135 45 L115 50 Z" fill="#e2e8f0"/>
+          <circle cx="40" cy="30" r="1.5" fill="#ffffff"/>
+          <circle cx="160" cy="25" r="2" fill="#ffffff"/>
+          <text x="100" y="95" text-anchor="middle" fill="#fecaca" font-size="10" font-weight="bold">YEAR 2050</text>
+        </svg>`,
+      exam: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#334155"/>
+          <rect x="60" y="20" width="80" height="80" rx="6" fill="#ffffff"/>
+          <text x="100" y="55" text-anchor="middle" fill="#ef4444" font-size="22" font-weight="black">F</text>
+          <line x1="75" y1="70" x2="125" y2="70" stroke="#cbd5e1" stroke-width="3"/>
+        </svg>`,
+      boxes: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#78350f"/>
+          <rect x="70" y="30" width="45" height="45" rx="4" fill="#d97706" transform="rotate(15 70 30)"/>
+          <path d="M40 100 L160 100" stroke="#fef3c7" stroke-width="4"/>
+          <text x="100" y="115" text-anchor="middle" fill="#fde68a" font-size="10" font-weight="bold">WATCH OUT!</text>
+        </svg>`,
+      friends: `
+        <svg class="w-full h-36" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="120" rx="12" fill="#581c87"/>
+          <circle cx="70" cy="55" r="18" fill="#a855f7"/>
+          <circle cx="130" cy="55" r="18" fill="#ec4899"/>
+          <path d="M90 70 Q100 80 110 70" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+          <text x="100" y="105" text-anchor="middle" fill="#f472b6" font-size="10" font-weight="bold">TONIGHT</text>
+        </svg>`
+    };
+
+    const gameDatabase = [
+      {
+        id: 1, type: "mc", difficulty: "Easy", stageTitle: "Stage 1: Instant Decisions",
+        prompt: "The phone is ringing loudly on the desk right now!",
+        subtext: "Choose the correct spontaneous response:",
+        questionText: "A: 'The phone is ringing!' <br>B: 'Don't worry, I _____ it.'",
+        svgKey: "phone",
+        options: [{ text: "will answer", correct: true }, { text: "am going to answer", correct: false }, { text: "am answering", correct: false }],
+        hint: "Spontaneous decision made right at the moment of speaking = WILL.",
+        rule: "Card #1: Use WILL for instant decisions."
+      },
+      {
+        id: 2, type: "mc", difficulty: "Easy", stageTitle: "Stage 1: Physical Evidence",
+        prompt: "Look up! Dark black storm clouds are gathering fast.",
+        subtext: "Predict based on clear present evidence:",
+        questionText: "Look at those dark, black clouds! It _____ rain very soon.",
+        svgKey: "clouds",
+        options: [{ text: "will", correct: false }, { text: "is going to", correct: true }, { text: "is raining", correct: false }],
+        hint: "Clear present evidence (dark clouds) = BE GOING TO.",
+        rule: "Card #2: Use BE GOING TO for predictions with present evidence."
+      },
+      {
+        id: 3, type: "mc", difficulty: "Easy", stageTitle: "Stage 1: Fixed Calendar Plans",
+        prompt: "You already bought plane tickets for London last month.",
+        subtext: "Select the option for fixed arrangements:",
+        questionText: "I _____ to London next Monday. Everything is booked!",
+        svgKey: "plane",
+        options: [{ text: "will fly", correct: false }, { text: "am flying", correct: true }, { text: "fly", correct: false }],
+        hint: "Tickets booked + specific date = PRESENT CONTINUOUS.",
+        rule: "Card #3: Use Present Continuous for fixed personal arrangements."
+      },
+      {
+        id: 4, type: "order", difficulty: "Medium", stageTitle: "Stage 2: Sentence Builder",
+        prompt: "Make a spontaneous promise to help your classmate with homework.",
+        subtext: "Tap words in the correct order:",
+        words: ["I", "will", "help", "you", "with", "your", "homework"],
+        correctOrder: ["I", "will", "help", "you", "with", "your", "homework"],
+        svgKey: "homework",
+        hint: "Order: Subject + WILL + Base Verb + Complement",
+        rule: "Sentence Structure: S + Auxiliary + Main Verb."
+      },
+      {
+        id: 5, type: "mc", difficulty: "Medium", stageTitle: "Stage 2: Prior Intentions",
+        prompt: "Discussing summer vacation plans decided weeks ago.",
+        subtext: "Choose the intention verb form:",
+        questionText: "We _____ visit our grandparents in Spain this summer. We decided last week.",
+        svgKey: "vacation",
+        options: [{ text: "are going to", correct: true }, { text: "will", correct: false }, { text: "are visiting to", correct: false }],
+        hint: "Decision made before speaking (intention) = BE GOING TO.",
+        rule: "Card #2: Prior plans/intentions take BE GOING TO."
+      },
+      {
+        id: 6, type: "order", difficulty: "Medium", stageTitle: "Stage 2: Dentist Appointment",
+        prompt: "Build the sentence describing a fixed doctor appointment.",
+        subtext: "Arrange the sentence correctly:",
+        words: ["She", "is", "seeing", "the", "dentist", "at", "3 PM"],
+        correctOrder: ["She", "is", "seeing", "the", "dentist", "at", "3 PM"],
+        svgKey: "dentist",
+        hint: "Order: Subject + IS + Verb-ING + Object + Time",
+        rule: "Present Continuous for scheduled events."
+      },
+      {
+        id: 7, type: "mc", difficulty: "Hard", stageTitle: "Stage 3: Futuristic Predictions",
+        prompt: "Thinking about human life in space by 2050.",
+        subtext: "Select the personal opinion prediction:",
+        questionText: "I think humans _____ live on Mars in fifty years.",
+        svgKey: "mars",
+        options: [{ text: "will", correct: true }, { text: "are going to", correct: false }, { text: "are living", correct: false }],
+        hint: "'I think' indicates personal opinion prediction = WILL.",
+        rule: "Card #1: Personal opinions take WILL."
+      },
+      {
+        id: 8, type: "order", difficulty: "Hard", stageTitle: "Stage 3: Negative Evidence",
+        prompt: "Construct a negative prediction based on bad test preparation.",
+        subtext: "Assemble the negative structure:",
+        words: ["He", "is", "not", "going", "to", "pass", "the", "exam"],
+        correctOrder: ["He", "is", "not", "going", "to", "pass", "the", "exam"],
+        svgKey: "exam",
+        hint: "Subject + IS + NOT + GOING TO + Base Verb",
+        rule: "Negative form of BE GOING TO."
+      },
+      {
+        id: 9, type: "mc", difficulty: "Hard", stageTitle: "Stage 3: Immediate Danger Warning",
+        prompt: "A heavy pile of boxes is tipping over right now!",
+        subtext: "Warn about immediate imminent physical action:",
+        questionText: "Watch out! You _____ drop those heavy boxes!",
+        svgKey: "boxes",
+        options: [{ text: "are going to", correct: true }, { text: "will", correct: false }, { text: "are dropping", correct: false }],
+        hint: "'Watch out!' draws attention to imminent physical action = BE GOING TO.",
+        rule: "Immediate observable danger takes BE GOING TO."
+      },
+      {
+        id: 10, type: "order", difficulty: "Hard", stageTitle: "Stage 3: Final Challenge Question",
+        prompt: "Ask someone about their fixed social plans for tonight.",
+        subtext: "Reorder the question sentence:",
+        words: ["Are", "you", "meeting", "your", "friends", "tonight?"],
+        correctOrder: ["Are", "you", "meeting", "your", "friends", "tonight?"],
+        svgKey: "friends",
+        hint: "Question Order: ARE + Subject + Verb-ING...",
+        rule: "Question structure for Present Continuous."
+      }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let streak = 0;
+    let maxStreak = 0;
+    let lives = 3;
+    let attemptsLeft = 2;
+    let powerup5050 = 1;
+    let powerupHint = 2;
+    let userOrderedWords = [];
+    let correctTotal = 0;
+
+    function playSound(type) {
+      try {
+        if (Tone.context.state !== 'running') Tone.start();
+        const synth = new Tone.Synth().toDestination();
+        if (type === 'correct') {
+          synth.triggerAttackRelease("E5", "8n");
+          setTimeout(() => synth.triggerAttackRelease("B5", "8n"), 100);
+        } else if (type === 'wrong') {
+          synth.triggerAttackRelease("C3", "8n");
+        } else if (type === 'powerup') {
+          synth.triggerAttackRelease("G5", "16n");
+        }
+      } catch (e) {}
+    }
+
+    function switchMode(mode) {
+      document.getElementById('game-view').classList.add('hidden');
+      document.getElementById('codex-view').classList.add('hidden');
+      document.getElementById('results-view').classList.add('hidden');
+
+      const tabGame = document.getElementById('tab-game');
+      const tabCodex = document.getElementById('tab-codex');
+
+      if (mode === 'game') {
+        document.getElementById('game-view').classList.remove('hidden');
+        tabGame.className = "px-5 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 flex items-center gap-2";
+        tabCodex.className = "px-5 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2";
+      } else if (mode === 'codex') {
+        document.getElementById('codex-view').classList.remove('hidden');
+        tabCodex.className = "px-5 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 flex items-center gap-2";
+        tabGame.className = "px-5 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-2";
+      }
+    }
+
+    function renderQuestion() {
+      const q = gameDatabase[currentIdx];
+      attemptsLeft = 2;
+
+      document.getElementById('stage-title').innerText = q.stageTitle;
+      document.getElementById('question-progress').innerText = `Mission ${currentIdx + 1} / ${gameDatabase.length}`;
+      document.getElementById('game-progress-bar').style.width = `${((currentIdx) / gameDatabase.length) * 100}%`;
+      document.getElementById('attempts-left').innerText = attemptsLeft;
+
+      document.getElementById('mode-badge').innerText = q.type === 'mc' ? 'Multiple Choice' : 'Sentence Builder';
+      document.getElementById('difficulty-indicator').innerText = q.difficulty;
+      document.getElementById('scene-prompt').innerText = q.prompt;
+      document.getElementById('scene-subtext').innerText = q.subtext;
+
+      // Render Dynamic SVG Graphic Scene
+      document.getElementById('svg-scene-container').innerHTML = vectorScenes[q.svgKey] || vectorScenes.phone;
+
+      document.getElementById('hint-panel').classList.add('hidden');
+      document.getElementById('hint-text').innerText = q.hint;
+
+      const playArea = document.getElementById('play-area');
+      playArea.innerHTML = '';
+
+      if (q.type === 'mc') {
+        const promptBox = document.createElement('div');
+        promptBox.className = "p-4 bg-white rounded-xl border border-slate-200 text-slate-800 font-bold text-lg mb-4 shadow-sm";
+        promptBox.innerHTML = q.questionText;
+        playArea.appendChild(promptBox);
+
+        const optionsGrid = document.createElement('div');
+        optionsGrid.className = "grid grid-cols-1 gap-3";
+
+        q.options.forEach((opt, idx) => {
+          const btn = document.createElement('button');
+          btn.type = "button";
+          btn.className = "mc-option w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition font-bold text-slate-800 flex justify-between items-center focus:outline-none";
+          btn.setAttribute('data-idx', idx);
+          btn.onclick = () => selectMcOption(btn);
+          btn.innerHTML = `<span>${opt.text}</span><i class="fa-regular fa-circle text-slate-400 text-xl check-icon"></i>`;
+          optionsGrid.appendChild(btn);
+        });
+
+        playArea.appendChild(optionsGrid);
+
+      } else if (q.type === 'order') {
+        userOrderedWords = [];
+        const shuffled = [...q.words].sort(() => Math.random() - 0.5);
+
+        const orderBox = document.createElement('div');
+        orderBox.className = "space-y-4";
+        orderBox.innerHTML = `
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase block mb-1">Your Constructed Sentence:</span>
+            <div id="target-box" class="min-h-[60px] p-3 bg-white border-2 border-dashed border-indigo-300 rounded-xl flex flex-wrap gap-2 items-center">
+              <span id="target-placeholder" class="text-slate-400 text-sm italic">Tap available words below...</span>
+            </div>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase block mb-1">Available Word Pool:</span>
+            <div id="source-box" class="p-3 bg-slate-200/60 rounded-xl flex flex-wrap gap-2 items-center min-h-[50px]"></div>
+          </div>
+        `;
+
+        playArea.appendChild(orderBox);
+
+        const sourceBox = document.getElementById('source-box');
+        shuffled.forEach(word => {
+          const chip = document.createElement('button');
+          chip.type = "button";
+          chip.className = "word-chip bg-indigo-600 text-white font-bold px-3.5 py-2 rounded-xl shadow text-sm hover:bg-indigo-700 transition";
+          chip.innerText = word;
+          chip.onclick = () => addWordToTarget(chip, word);
+          sourceBox.appendChild(chip);
+        });
+      }
+    }
+
+    function selectMcOption(selectedBtn) {
+      document.querySelectorAll('.mc-option').forEach(btn => {
+        btn.classList.remove('border-indigo-600', 'bg-indigo-50', 'selected');
+        btn.classList.add('border-slate-200');
+        btn.querySelector('.check-icon').className = "fa-regular fa-circle text-slate-400 text-xl check-icon";
+      });
+
+      selectedBtn.classList.remove('border-slate-200');
+      selectedBtn.classList.add('border-indigo-600', 'bg-indigo-50', 'selected');
+      selectedBtn.querySelector('.check-icon').className = "fa-solid fa-circle-check text-indigo-600 text-xl check-icon";
+    }
+
+    function addWordToTarget(chip, word) {
+      const targetBox = document.getElementById('target-box');
+      const placeholder = document.getElementById('target-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+
+      const placedChip = document.createElement('button');
+      placedChip.type = "button";
+      placedChip.className = "word-chip bg-slate-900 text-amber-400 font-bold px-3.5 py-2 rounded-xl shadow text-sm flex items-center gap-1.5";
+      placedChip.innerHTML = `<span>${word}</span> <i class="fa-solid fa-xmark text-xs opacity-60"></i>`;
+
+      const id = 'placed-' + Math.random();
+      placedChip.id = id;
+
+      placedChip.onclick = () => {
+        targetBox.removeChild(placedChip);
+        chip.style.display = 'inline-block';
+        userOrderedWords = userOrderedWords.filter(item => item.id !== id);
+        if (targetBox.querySelectorAll('button').length === 0 && placeholder) {
+          placeholder.style.display = 'inline';
+        }
+      };
+
+      userOrderedWords.push({ id, word });
+      targetBox.appendChild(placedChip);
+      chip.style.display = 'none';
+    }
+
+    function usePowerup(type) {
+      const q = gameDatabase[currentIdx];
+      if (type === '5050' && powerup5050 > 0 && q.type === 'mc') {
+        powerup5050--;
+        document.getElementById('count-5050').innerText = powerup5050;
+        playSound('powerup');
+
+        const incorrectOptions = document.querySelectorAll('.mc-option');
+        let removed = 0;
+        incorrectOptions.forEach(btn => {
+          const idx = parseInt(btn.getAttribute('data-idx'));
+          if (!q.options[idx].correct && removed < 1) {
+            btn.style.opacity = '0.2';
+            btn.style.pointerEvents = 'none';
+            removed++;
+          }
+        });
+      } else if (type === 'hint' && powerupHint > 0) {
+        powerupHint--;
+        document.getElementById('count-hint').innerText = powerupHint;
+        playSound('powerup');
+        document.getElementById('hint-panel').classList.remove('hidden');
+      }
+    }
+
+    function submitCurrentAnswer() {
+      const q = gameDatabase[currentIdx];
+      let isCorrect = false;
+
+      if (q.type === 'mc') {
+        const selected = document.querySelector('.mc-option.selected');
+        if (!selected) {
+          showModal("Selection Required", "Please select an answer before submitting.");
+          return;
+        }
+        const selectedIdx = parseInt(selected.getAttribute('data-idx'));
+        isCorrect = q.options[selectedIdx].correct;
+      } else if (q.type === 'order') {
+        const words = userOrderedWords.map(w => w.word);
+        if (words.length < q.words.length) {
+          showModal("Incomplete Sentence", "Place all words in the target box!");
+          return;
+        }
+        isCorrect = JSON.stringify(words) === JSON.stringify(q.correctOrder);
+      }
+
+      if (isCorrect) {
+        playSound('correct');
+        streak++;
+        if (streak > maxStreak) maxStreak = streak;
+        score += 100 * streak;
+        correctTotal++;
+
+        updateHUD();
+        showFeedbackModal(true, "Excellent Work!", q.rule, () => { nextQuestion(); });
+      } else {
+        playSound('wrong');
+        attemptsLeft--;
+        document.getElementById('attempts-left').innerText = attemptsLeft;
+
+        if (attemptsLeft > 0) {
+          showFeedbackModal(false, "Not Quite Right!", `Try again! ${q.hint}`);
+        } else {
+          streak = 0;
+          lives--;
+          updateHUD();
+
+          if (lives <= 0) {
+            showResults();
+          } else {
+            showFeedbackModal(false, "Out of Attempts!", `The correct rule: ${q.rule}`, () => { nextQuestion(); });
+          }
+        }
+      }
+    }
+
+    function nextQuestion() {
+      currentIdx++;
+      if (currentIdx < gameDatabase.length && lives > 0) {
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function updateHUD() {
+      document.getElementById('hud-score').innerText = score;
+      document.getElementById('hud-streak').innerText = `${streak}x`;
+      document.getElementById('hud-lives').innerText = lives;
+    }
+
+    function showModal(title, msg) {
+      const modal = document.createElement('div');
+      modal.className = "fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4";
+      modal.innerHTML = `
+        <div class="glass-card-light p-6 rounded-2xl max-w-sm w-full text-center space-y-4">
+          <h3 class="text-xl font-black text-slate-900">${title}</h3>
+          <p class="text-sm text-slate-600">${msg}</p>
+          <button onclick="this.parentElement.parentElement.remove()" class="w-full py-2.5 bg-indigo-600 text-white font-bold rounded-xl">OK</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function showFeedbackModal(isSuccess, title, msg, onNext) {
+      const modal = document.createElement('div');
+      modal.className = "fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4";
+      modal.innerHTML = `
+        <div class="bg-slate-900 border border-slate-700 p-6 rounded-3xl max-w-md w-full text-center space-y-4 shadow-2xl">
+          <div class="w-16 h-16 mx-auto rounded-full ${isSuccess ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'} flex items-center justify-center text-3xl">
+            <i class="fa-solid ${isSuccess ? 'fa-check' : 'fa-xmark'}"></i>
+          </div>
+          <h3 class="text-2xl font-black text-white">${title}</h3>
+          <p class="text-sm text-slate-300 bg-slate-800/80 p-4 rounded-xl border border-slate-700">${msg}</p>
+          <button id="modal-btn" class="w-full py-3.5 ${isSuccess ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-slate-700 hover:bg-slate-600'} text-white font-black rounded-xl transition">
+            Continue
+          </button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      document.getElementById('modal-btn').onclick = () => {
+        modal.remove();
+        if (onNext) onNext();
+      };
+    }
+
+    function showResults() {
+      document.getElementById('game-view').classList.add('hidden');
+      document.getElementById('results-view').classList.remove('hidden');
+
+      document.getElementById('res-score').innerText = score;
+      document.getElementById('res-streak').innerText = `${maxStreak}x`;
+      const accuracy = Math.round((correctTotal / gameDatabase.length) * 100);
+      document.getElementById('res-accuracy').innerText = `${accuracy}%`;
+    }
+
+    function restartQuest() {
+      currentIdx = 0;
+      score = 0;
+      streak = 0;
+      maxStreak = 0;
+      lives = 3;
+      correctTotal = 0;
+      powerup5050 = 1;
+      powerupHint = 2;
+
+      document.getElementById('count-5050').innerText = powerup5050;
+      document.getElementById('count-hint').innerText = powerupHint;
+
+      updateHUD();
+      switchMode('game');
+      renderQuestion();
+    }
+
+    window.onload = function() {
+      renderQuestion();
+    };
+  </script>
+</body>
+</html>
